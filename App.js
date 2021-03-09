@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   View, 
   ScrollView, 
@@ -13,11 +13,15 @@ import {
 import Carousel from 'react-native-snap-carousel';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import Slide from './src/components/Slide';
+
 // o width e o height do Dimensions é para pegar a altura e largura total do
 // dispositivo que está acessando o app
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 export default function App() {
+  const carouselRef = useRef(null);
+
   const [list, setList] = useState([
     {
       title:"O Justiceiro",
@@ -57,6 +61,7 @@ export default function App() {
     },
   ]);
   const [background, setBackground] = useState(list[0].img);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   return (
     <ScrollView style={styles.container}>
@@ -65,7 +70,7 @@ export default function App() {
           <ImageBackground
             source={{ uri: background }}
             style={styles.imageBackground}
-            blurRadius={8}
+            blurRadius={5}
           >
             <View style={styles.viewSearch}>
               <TextInput 
@@ -93,7 +98,34 @@ export default function App() {
             </Text>
 
             <View style={styles.slideView}>
+              <Carousel 
+                style={styles.carousel}
+                ref={carouselRef}
+                data={list}
+                renderItem={Slide}
+                sliderWidth={screenWidth}
+                itemWidth={200}
+                // opacidade dos slides que não estão ativos
+                inactiveSlideOpacity={0.5}
+                onSnapToItem={(index) => {
+                  setBackground(list[index].img);
+                  setActiveIndex(index);
+                }}
+              />
+            </View>
 
+            <View style={styles.moreInfo}>
+              <View style={{ marginTop: 10 }}>
+                <Text style={styles.movieTitle}>{list[activeIndex].title}</Text>
+                <Text style={styles.movieDescription}>{list[activeIndex].text}</Text>
+              </View>
+              <TouchableOpacity style={{ marginRight: 15, marginTop: 10 }}>
+                <Icon 
+                  name="queue" 
+                  color="#131313" 
+                  size={30} 
+                />
+              </TouchableOpacity>
             </View>
 
           </ImageBackground>
@@ -146,5 +178,35 @@ const styles = StyleSheet.create({
     height: 340,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  carousel: {
+    flex: 1,
+    overflow: 'visible',
+  },
+
+  moreInfo: {
+    backgroundColor: '#FFF',
+    width: screenWidth,
+    height: screenHeight,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-around'
+  },
+
+  movieTitle: {
+    paddingLeft: 15,
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#131313',
+    marginBottom: 5,
+  },
+
+  movieDescription: {
+    paddingLeft: 15,
+    color: '#131313',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
 });
