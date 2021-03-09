@@ -11,7 +11,7 @@ export default function Slide({ item, index }) {
       <TouchableOpacity>
         <Image 
           source={{ uri: item.img }}
-          style={styles.carouselImg}
+          style={styles.carouselImage}
         />
         <Text style={styles.carouselText}>{item.title}</Text>
         <Icon 
